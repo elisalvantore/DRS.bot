@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("dotenv").config(); //npm run dev
 
 const { Client, GatewayIntentBits, Events, EmbedBuilder } = require("discord.js");
 
