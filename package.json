@@ -1,0 +1,16 @@
+{
+  "name": "discord-bot",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js", //npm run dev
+    "dev": "nodemon main.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.26.3",
+    "dotenv": "^17.4.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
