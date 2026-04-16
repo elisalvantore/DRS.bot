@@ -1,51 +1,36 @@
 const { PermissionFlagsBits, EmbedBuilder } = require("discord.js");
+const fs = require("fs");
+const path = require("path");
 
 // ================================================================
-// ⚙️ CẤU HÌNH — Thay tất cả ID bên dưới theo server của bạn
+// ⚙️ LOAD CONFIGS TỪ FILE JSON — Hỗ trợ nhiều server
 // ================================================================
-const CONFIG = {
-  // ID kênh đăng ký (nơi user nhắn để xin role)
-  REGISTER_CHANNEL_ID: "1493790687576199178",
+let CONFIGS = {};
+try {
+  const configPath = path.join(__dirname, "configs.json");
+  CONFIGS = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+  console.log("✅ Đã load configs từ configs.json");
+} catch (err) {
+  console.error("❌ Lỗi khi load configs.json:", err.message);
+  CONFIGS = {};
+}
 
-  // Link dẫn thẳng vào kênh đăng ký
-  // Cách lấy: chuột phải vào kênh → Copy Link
-  REGISTER_CHANNEL_LINK: "https://discord.com/channels/1143023342656426004/1493790687576199178",
-
-  // Role cấp cho người mới join (để họ thấy được kênh đăng ký)
-  GUEST_ROLE_ID: "1493792024615321680",
-
-  // Role bị XÓA khi admin duyệt hoặc từ chối
-  PENDING_ROLE_ID: "1493792024615321680",
-
-  // Role được CẤP khi admin duyệt ✅
-  MEMBER_ROLE_ID: "1493793073002446928",
-
-  // Role thứ 2 được CẤP thêm khi admin duyệt ✅ (để trống "" nếu không cần)
-  EXTRA_ROLE_ID: "",
-
-  // Emoji để admin DUYỆT
-  APPROVE_EMOJI: "✅",
-
-  // Emoji để admin TỪ CHỐI
-  REJECT_EMOJI: "❌",
-
-  // ID role của admin/mod có quyền duyệt
-  APPROVER_ROLE_IDS: ["1437386631152930836"],
-
-  // Tên clan/server để hiển thị trong tin nhắn
-  CLAN_NAME: "Clan của chúng tôi",
-};
+// Hàm lấy config cho một server cụ thể (dựa trên guildId)
+function getGuildConfig(guildId) {
+  return CONFIGS[guildId] || null;
+}
 // ================================================================
 
 // Lưu danh sách tin nhắn đang chờ duyệt { messageId: userId }
 const pendingMessages = new Map();
 
-// Lưu DM đang chờ phản hồi từ user mới { userId: dmMessageId }
+// Lưu DM đang chờ phản hồi từ user mới { userId: { dmMessageId, guildId } }
 const pendingDMs = new Map();
 
-function isApprover(member) {
+function isApprover(member, config) {
+  if (!config) return false;
   if (member.permissions.has(PermissionFlagsBits.ManageRoles)) return true;
-  return CONFIG.APPROVER_ROLE_IDS.some((id) => member.roles.cache.has(id));
+  return config.APPROVER_ROLE_IDS.some((id) => member.roles.cache.has(id));
 }
 
 // ── Khởi tạo module ────────────────────────────────────────────
@@ -56,6 +41,12 @@ function init(client) {
 // ── Xử lý thành viên mới join ──────────────────────────────────
 async function handleNewMember(member, client) {
   try {
+    const CONFIG = getGuildConfig(member.guild.id);
+    if (!CONFIG) {
+      console.warn(`⚠️ Không tìm thấy config cho server: ${member.guild.id}`);
+      return;
+    }
+
     // Cấp guest role để họ thấy kênh đăng ký
     if (CONFIG.GUEST_ROLE_ID) {
       await member.roles.add(CONFIG.GUEST_ROLE_ID).catch(() => {});
@@ -73,8 +64,8 @@ async function handleNewMember(member, client) {
     await dm.react("✅");
     await dm.react("❌");
 
-    // Lưu lại để xử lý sau
-    pendingDMs.set(member.id, dm.id);
+    // Lưu lại để xử lý sau { messageId, guildId }
+    pendingDMs.set(member.id, { dmMessageId: dm.id, guildId: member.guild.id });
 
     console.log(`📩 Đã gửi DM cho thành viên mới: ${member.user.tag}`);
   } catch (err) {
@@ -103,16 +94,22 @@ async function handleReaction(reaction, user, client) {
   }
 
   // ── TRƯỜNG HỢP 2: Admin react vào tin nhắn trong kênh đăng ký ──
+  const CONFIG = getGuildConfig(reaction.message.guild.id);
+  if (!CONFIG) return;
+
   if (reaction.message.channel.id === CONFIG.REGISTER_CHANNEL_ID) {
-    await handleAdminReaction(reaction, user, client);
+    await handleAdminReaction(reaction, user, client, CONFIG);
   }
 }
 
 // ── Xử lý khi user react vào DM ───────────────────────────────
 async function handleDMReaction(reaction, user, client) {
   // Kiểm tra đây có phải DM mình đã gửi không
-  const dmMessageId = pendingDMs.get(user.id);
-  if (!dmMessageId || reaction.message.id !== dmMessageId) return;
+  const dmData = pendingDMs.get(user.id);
+  if (!dmData || reaction.message.id !== dmData.dmMessageId) return;
+
+  const CONFIG = getGuildConfig(dmData.guildId);
+  if (!CONFIG) return;
 
   const emoji = reaction.emoji.name;
 
@@ -150,12 +147,12 @@ async function handleDMReaction(reaction, user, client) {
 }
 
 // ── Xử lý khi admin react trong kênh đăng ký ──────────────────
-async function handleAdminReaction(reaction, user, client) {
+async function handleAdminReaction(reaction, user, client, CONFIG) {
   const guild = reaction.message.guild;
   const approver = await guild.members.fetch(user.id).catch(() => null);
 
   // Kiểm tra quyền admin/mod
-  if (!approver || !isApprover(approver)) {
+  if (!approver || !isApprover(approver, CONFIG)) {
     await reaction.users.remove(user.id).catch(() => {});
     return;
   }
@@ -244,7 +241,8 @@ async function handleAdminReaction(reaction, user, client) {
 
 // ── Xử lý tin nhắn mới trong kênh đăng ký ─────────────────────
 async function handleRegisterMessage(message) {
-  if (message.channel.id !== CONFIG.REGISTER_CHANNEL_ID) return;
+  const CONFIG = getGuildConfig(message.guild.id);
+  if (!CONFIG || message.channel.id !== CONFIG.REGISTER_CHANNEL_ID) return;
   if (message.author.bot) return;
 
   try {
@@ -261,5 +259,5 @@ module.exports = {
   handleNewMember,
   handleReaction,
   handleRegisterMessage,
-  CONFIG,
+  getGuildConfig,
 };
