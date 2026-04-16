@@ -53,11 +53,8 @@ async function handleNewMember(member, client) {
     }
 
     // Gửi DM hỏi có muốn vào clan không
-    const { EmbedBuilder } = require("discord.js");
-
-// Gửi DM hỏi có muốn vào clan không
     const embed = new EmbedBuilder()
-      .setColor("#ff3b3b")
+      .setColor(0xff3b3b)
       .setTitle("👋 Welcome to Demon Rise")
       .setDescription(
         `🔥 Chào mừng chiến binh **${member.user.username}**!\n\n` +
