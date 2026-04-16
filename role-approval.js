@@ -53,12 +53,28 @@ async function handleNewMember(member, client) {
     }
 
     // Gửi DM hỏi có muốn vào clan không
-    const dm = await member.send(
-      `👋 Chào **${member.user.username}** đã đến với server!\n\n` +
-      `Bạn có muốn tham gia **${CONFIG.CLAN_NAME}** không?\n\n` +
-      `✅ — Có, tôi muốn tham gia!\n` +
-      `❌ — Không, cảm ơn!`
-    );
+    const { EmbedBuilder } = require("discord.js");
+
+// Gửi DM hỏi có muốn vào clan không
+    const embed = new EmbedBuilder()
+      .setColor("#ff3b3b")
+      .setTitle("👋 Welcome to Demon Rise")
+      .setDescription(
+        `🔥 Chào mừng chiến binh **${member.user.username}**!\n\n` +
+        `Bạn vừa đặt chân vào lãnh địa của chúng tôi.\n` +
+        `Chúng tôi rất vui khi có bạn ở đây.\n\n` +
+        `Bạn có muốn gia nhập **${CONFIG.CLAN_NAME}** để cùng chiến đấu và phát triển không?\n\n` +
+        `**— ⚔️ Nhấn ✅ để gia nhập**\n` +
+        `**— 🕊️ Nhấn ❌ nếu bạn chỉ muốn tham quan**`
+      )
+      .setThumbnail(member.user.displayAvatarURL())
+      .setImage("https://i.pinimg.com/736x/87/ff/05/87ff057d6adfe542c757e6aa466e4265.jpg")
+      .setFooter({ text: "Demon Rise Server" })
+      .setTimestamp();
+
+    const dm = await member.send({
+      embeds: [embed]
+    });
 
     // Thêm 2 reaction vào DM
     await dm.react("✅");
@@ -181,6 +197,11 @@ async function handleAdminReaction(reaction, user, client, CONFIG) {
       // Xóa role pending
       if (CONFIG.PENDING_ROLE_ID && targetMember.roles.cache.has(CONFIG.PENDING_ROLE_ID)) {
         await targetMember.roles.remove(CONFIG.PENDING_ROLE_ID);
+      }
+
+      // Xóa role thứ 2 nếu có
+      if (CONFIG.DELETE_ROLE_2_ID && targetMember.roles.cache.has(CONFIG.DELETE_ROLE_2_ID)) {
+        await targetMember.roles.remove(CONFIG.DELETE_ROLE_2_ID);
       }
 
       // Xóa guest role
