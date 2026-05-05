@@ -517,7 +517,7 @@ ${getEmoji("time")} **Thời gian đăng ký:** <t:${Math.floor(Date.now() / 100
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-${getEmoji("warning")} **⚠️ Lưu ý:**
+${getEmoji("warning")} **Lưu ý:**
 • Hãy có mặt đúng giờ
 • Đọc kỹ thể lệ trước khi thi đấu
 • Giữ tinh thần fair-play
@@ -558,11 +558,6 @@ ${getEmoji("tada")} **Cảm ơn ${member.toString()} đã đăng ký tham gia gi
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ${getEmoji("id")} **ID Ingame của bạn:** \`${ingameId}\`
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-${competitionChannel ? `${getEmoji("link")} **Kênh thi đấu:** ${competitionChannel.toString()}\n` : ""}
-${getEmoji("info")} **Thông tin chi tiết sẽ được thông báo sau**
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
