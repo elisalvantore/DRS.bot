@@ -136,6 +136,12 @@ ${getEmoji("warning")} **LƯU Ý QUAN TRỌNG**
 
   // Xử lý tất cả interactions
   async handleInteraction(interaction, client) {
+    // Kiểm tra nếu interaction đã được xử lý thì bỏ qua
+    if (interaction.replied || interaction.deferred) {
+        console.log(`⚠️ Interaction ${interaction.customId} đã được xử lý trước đó, bỏ qua.`);
+        return;
+    }
+
     // Xử lý Modal submit
     if (interaction.isModalSubmit()) {
       if (interaction.customId.startsWith("register_modal_")) {

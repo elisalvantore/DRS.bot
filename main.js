@@ -219,12 +219,19 @@ client.on(Events.GuildMemberAdd, (member) => {
   roleApproval.handleNewMember(member, client);
 });
 
-// Trong phần xử lý InteractionCreate, thêm dòng này
+// Trong main.js, chỉ có DUY NHẤT một handler cho InteractionCreate
 client.on(Events.InteractionCreate, async (interaction) => {
-  // Xử lý từ module custom
-  await custom.handleInteraction(interaction, client);
-  
-  // Các handler khác nếu có
+  try {
+    // Gộp tất cả xử lý vào đây
+    await custom.handleInteraction(interaction, client);
+    
+    // Nếu có các handler khác, dùng if/else để tránh trùng
+    // if (interaction.isButton() && interaction.customId.startsWith("approve_")) {
+    //   await custom.handleApproval(interaction, client);
+    // }
+  } catch (error) {
+    console.error("Lỗi xử lý interaction:", error.message);
+  }
 });
 
 // Khi thành viên boost server (ĐÃ TẠM THỜI TẮT)
