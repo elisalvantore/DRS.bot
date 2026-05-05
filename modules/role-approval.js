@@ -1,24 +1,22 @@
 const { PermissionFlagsBits, EmbedBuilder } = require("discord.js");
-const fs = require("fs");
-const path = require("path");
+const { getGuildConfig } = require("./configHelper"); // Import từ configHelper
 
 // ================================================================
 // ⚙️ LOAD CONFIGS TỪ FILE JSON — Hỗ trợ nhiều server
 // ================================================================
-let CONFIGS = {};
-try {
-  const configPath = path.join(__dirname, "configs.json");
-  CONFIGS = JSON.parse(fs.readFileSync(configPath, "utf-8"));
-  console.log("✅ Đã load configs từ configs.json");
-} catch (err) {
-  console.error("❌ Lỗi khi load configs.json:", err.message);
-  CONFIGS = {};
-}
-
-// Hàm lấy config cho một server cụ thể (dựa trên guildId)
-function getGuildConfig(guildId) {
-  return CONFIGS[guildId] || null;
-}
+// let CONFIGS = {};
+// try {
+//   const configPath = path.join(__dirname, "configs.json");
+//   CONFIGS = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+//   console.log("✅ Đã load configs từ configs.json");
+// } catch (err) {
+//   console.error("❌ Lỗi khi load configs.json:", err.message);
+//   CONFIGS = {};
+// }
+// 
+// function getGuildConfig(guildId) {
+//   return CONFIGS[guildId] || null;
+// }
 // ================================================================
 
 // Lưu danh sách tin nhắn đang chờ duyệt { messageId: userId }
@@ -30,7 +28,7 @@ const pendingDMs = new Map();
 function isApprover(member, config) {
   if (!config) return false;
   if (member.permissions.has(PermissionFlagsBits.ManageRoles)) return true;
-  return config.APPROVER_ROLE_IDS.some((id) => member.roles.cache.has(id));
+  return config.APPROVER_ROLE_IDS?.some((id) => member.roles.cache.has(id)) || false;
 }
 
 // ── Khởi tạo module ────────────────────────────────────────────
@@ -54,8 +52,8 @@ async function handleNewMember(member, client) {
 
     // Gửi DM hỏi có muốn vào clan không
     const embed = new EmbedBuilder()
-      .setColor(0xff3b3b)
-      .setTitle("👋 Welcome to Demon Rise")
+      .setColor(0x00BFFF)
+      .setTitle("**👋 Welcome to ShadowTiger-Esport!**")
       .setDescription(
         `🔥 Chào mừng chiến binh **${member.user.username}**!\n\n` +
         `Bạn vừa đặt chân vào lãnh địa của chúng tôi.\n` +
@@ -65,8 +63,8 @@ async function handleNewMember(member, client) {
         `**— 🕊️ Nhấn ❌ nếu bạn chỉ muốn tham quan**`
       )
       .setThumbnail(member.user.displayAvatarURL())
-      .setImage("https://i.pinimg.com/736x/87/ff/05/87ff057d6adfe542c757e6aa466e4265.jpg")
-      .setFooter({ text: "Demon Rise Server" })
+      .setImage("https://i.pinimg.com/736x/8c/06/63/8c0663c433e24cf83175d39f741e5931.jpg")
+      .setFooter({ text: "ShadowTiger-Esports" })
       .setTimestamp();
 
     const dm = await member.send({
@@ -129,8 +127,13 @@ async function handleDMReaction(reaction, user, client) {
   if (emoji === "✅") {
     // User đồng ý → gửi link kênh đăng ký
     await reaction.message.channel.send(
-      `🎉 Tuyệt vời! Hãy vào kênh đăng ký bên dưới và nhắn tin để được admin duyệt nhé:\n` +
+      `🎉 Tuyệt vời! Hãy vào kênh đăng ký bên dưới và nhắn tin để được Admin duyệt nhé:\n` +
       `👉 ${CONFIG.REGISTER_CHANNEL_LINK}\n\n` +
+      `📝 **FORM MẪU:**\n` +
+      `\`• Họ và tên:\` \n` +
+      `\`• Tuổi:\` \n` +
+      `\`• Kinh nghiệm chơi game:\` \n` +
+      `\`• Lý do muốn gia nhập:\` \n\n` +
       `Hãy giới thiệu bản thân trong kênh đó để được cấp role thành viên!`
     );
 
@@ -151,7 +154,7 @@ async function handleDMReaction(reaction, user, client) {
     // User từ chối
     await reaction.message.channel.send(
       `😊 Cảm ơn bạn đã ghé thăm server!\n` +
-      `Chúc bạn có những giây phút vui vẻ. Nếu đổi ý, cứ nhắn tin cho admin nhé! 👋`
+      `Chúc bạn có những giây phút vui vẻ. Nếu đổi ý, cứ nhắn tin cho Admin nhé! 👋`
     );
   }
 
@@ -239,7 +242,7 @@ async function handleAdminReaction(reaction, user, client, CONFIG) {
       await targetUser.send(
         `😔 Xin lỗi **${targetUser.username}**!\n` +
         `Đơn đăng ký của bạn vào **${CONFIG.CLAN_NAME}** đã bị từ chối.\n\n` +
-        `Nếu bạn muốn thử lại hoặc cần thêm thông tin, hãy liên hệ admin nhé! 💪`
+        `Nếu bạn muốn thử lại hoặc cần thêm thông tin, hãy liên hệ Admin nhé! 💪`
       ).catch(() => {});
 
       // Thông báo trong kênh
