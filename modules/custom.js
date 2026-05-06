@@ -136,9 +136,8 @@ ${getEmoji("warning")} **LƯU Ý QUAN TRỌNG**
 
   // Xử lý tất cả interactions
   async handleInteraction(interaction, client) {
-    // Kiểm tra nếu interaction đã được xử lý thì bỏ qua
+    // Kiểm tra nếu interaction đã được xử lý thì bỏ qua ngay lập tức
     if (interaction.replied || interaction.deferred) {
-        console.log(`⚠️ Interaction ${interaction.customId} đã được xử lý trước đó, bỏ qua.`);
         return;
     }
 
@@ -216,7 +215,9 @@ ${getEmoji("heart")} Cảm ơn bạn đã quan tâm đến giải đấu của c
     
     // ========== NÚT HỖ TRỢ ==========
     if (interaction.customId === "custom_support") {
-      await interaction.deferReply({ flags: 64 });
+      if (!interaction.deferred && !interaction.replied) {
+        await interaction.deferReply({ flags: 64 });
+    }
       
       const member = interaction.member;
       const guild = interaction.guild;
@@ -336,7 +337,9 @@ ${getEmoji("heart")} Admin/Mod sẽ hỗ trợ bạn ngay khi có thể!
     
     // ========== NÚT TRỞ THÀNH NHÀ TÀI TRỢ ==========
     if (interaction.customId === "custom_sponsor") {
-      await interaction.deferReply({ flags: 64 });
+      if (!interaction.deferred && !interaction.replied) {
+        await interaction.deferReply({ flags: 64 });
+      }
       
       const member = interaction.member;
       const guild = interaction.guild;
