@@ -76,10 +76,12 @@ ${getEmoji("register")} **ĐĂNG KÝ THAM GIA**
 ${getEmoji("support")} **HỖ TRỢ & GIẢI ĐÁP**
 • Có thắc mắc về giải đấu? Cần hỗ trợ?
 • Nhấn nút "HỖ TRỢ" để được tạo kênh riêng
+• Chỉ mở kênh hỗ trợ khi thực sự có việc cần hỗ trợ
 
 ${getEmoji("sponsor")} **TRỞ THÀNH NHÀ TÀI TRỢ**
 • Muốn đóng góp cho các giải đấu tiếp theo?
 • Nhấn nút "TRỞ THÀNH NHÀ TÀI TRỢ" để được hỗ trợ
+• Chỉ mở kênh tài trợ khi thực sự có việc cần hỗ trợ
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -181,8 +183,7 @@ ${getEmoji("info")} **Để tham gia giải custom, bạn cần:**
 2️⃣ Đọc kỹ nội quy và luật lệ của clan
 3️⃣ Liên hệ với Ban Quản Trị để được hỗ trợ
 
-${getEmoji("contact")} **Liên hệ ngay:**
-${adminMentions || "@Admin"}
+${getEmoji("contact")} **Liên hệ ngay với Admin/Mod nhé**
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -217,13 +218,16 @@ ${getEmoji("heart")} Cảm ơn bạn đã quan tâm đến giải đấu của c
     if (interaction.customId === "custom_support") {
       if (!interaction.deferred && !interaction.replied) {
         await interaction.deferReply({ flags: 64 });
-    }
+      } else{
+      return;
+      }
       
       const member = interaction.member;
       const guild = interaction.guild;
-      const adminRoleIds = guildConfig.APPROVER_ROLE_IDS || [];
-      const sponsorRoleId = guildConfig.SPONSOR_ROLE_ID; // Role cho nhà tài trợ
-      
+      // const adminRoleIds = guildConfig.APPROVER_ROLE_IDS || [];
+      // const sponsorRoleId = guildConfig.SPONSOR_ROLE_ID; // Role cho nhà tài trợ
+      const supportTagRoleIds = guildConfig.SUPPORT_TAG_ROLE_IDS || guildConfig.APPROVER_ROLE_IDS || [];
+
       try {
         // Tìm hoặc tạo category HỖ TRỢ
         let supportCategory = guild.channels.cache.find(
@@ -269,7 +273,7 @@ ${getEmoji("heart")} Cảm ơn bạn đã quan tâm đến giải đấu của c
         });
         
         // Thêm quyền cho Admin và Mod
-        for (const roleId of adminRoleIds) {
+        for (const roleId of supportTagRoleIds) {
           await supportChannel.permissionOverwrites.create(roleId, {
             ViewChannel: true,
             SendMessages: true,
@@ -283,7 +287,7 @@ ${getEmoji("heart")} Cảm ơn bạn đã quan tâm đến giải đấu của c
         supportChannelCount.set(guild.id, channelNumber);
         
         // Tag admin và mod
-        const adminMentions = adminRoleIds.map(roleId => `<@&${roleId}>`).join(" ");
+        const roleMentions = supportTagRoleIds.map(roleId => `<@&${roleId}>`).join(" ");
         
         // Gửi tin nhắn trong kênh hỗ trợ
         const supportEmbed = new EmbedBuilder()
@@ -304,7 +308,7 @@ ${getEmoji("warning")} **Lưu ý:** Admin/Mod sẽ hỗ trợ bạn trong thời
           .setFooter({ text: `Kênh hỗ trợ #${channelNumber}` });
         
         await supportChannel.send({
-          content: `${adminMentions} có member cần hỗ trợ! ${getEmoji("alert")}`,
+          content: `${roleMentions} có member cần hỗ trợ! ${getEmoji("alert")}`,
           embeds: [supportEmbed]
         });
         
@@ -343,14 +347,14 @@ ${getEmoji("heart")} Admin/Mod sẽ hỗ trợ bạn ngay khi có thể!
       
       const member = interaction.member;
       const guild = interaction.guild;
-      const adminRoleIds = guildConfig.APPROVER_ROLE_IDS || [];
+      const supportTagRoleIds = guildConfig.SUPPORT_TAG_ROLE_IDS || guildConfig.APPROVER_ROLE_IDS || [];
       const sponsorRoleId = guildConfig.SPONSOR_ROLE_ID;
       
       try {
         // Cấp role nhà tài trợ nếu có
-        if (sponsorRoleId && !member.roles.cache.has(sponsorRoleId)) {
-          await member.roles.add(sponsorRoleId);
-        }
+        // if (sponsorRoleId && !member.roles.cache.has(sponsorRoleId)) {
+        //   await member.roles.add(sponsorRoleId);
+        // }
         
         // Tìm hoặc tạo category TÀI TRỢ
         let sponsorCategory = guild.channels.cache.find(
@@ -396,7 +400,7 @@ ${getEmoji("heart")} Admin/Mod sẽ hỗ trợ bạn ngay khi có thể!
         });
         
         // Thêm quyền cho Admin và Mod
-        for (const roleId of adminRoleIds) {
+        for (const roleId of supportTagRoleIds) {
           await sponsorChannel.permissionOverwrites.create(roleId, {
             ViewChannel: true,
             SendMessages: true,
@@ -410,7 +414,7 @@ ${getEmoji("heart")} Admin/Mod sẽ hỗ trợ bạn ngay khi có thể!
         sponsorChannelCount.set(guild.id, channelNumber);
         
         // Tag admin và mod
-        const adminMentions = adminRoleIds.map(roleId => `<@&${roleId}>`).join(" ");
+        const roleMentions = supportTagRoleIds.map(roleId => `<@&${roleId}>`).join(" ");
         
         // Gửi tin nhắn trong kênh tài trợ
         const sponsorEmbed = new EmbedBuilder()
@@ -434,7 +438,7 @@ ${getEmoji("heart")} Cảm ơn nhà tài trợ đã quan tâm đến sự phát 
           .setFooter({ text: `Kênh tài trợ #${channelNumber}` });
         
         await sponsorChannel.send({
-          content: `${adminMentions} có nhà tài trợ! ${getEmoji("party")}`,
+          content: `${roleMentions} có nhà tài trợ! ${getEmoji("party")}`,
           embeds: [sponsorEmbed]
         });
         

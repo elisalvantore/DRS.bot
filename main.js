@@ -24,6 +24,8 @@ const stealemo = require("./modules/stealemo");
 
 const custom = require("./modules/custom");
 
+const countdown = require("./modules/countdown");
+
 const cooldowns = new Map();
 
 const PREFIX = "!";
@@ -34,6 +36,8 @@ const PREFIX = "!";
 client.once(Events.ClientReady, (c) => {
   console.log(`✅ Bot đã online: ${c.user.tag}`);
   roleApproval.init(client);
+  // custom.init(client);
+  // countdown.init(client);
 });
 
 client.on(Events.MessageCreate, async (message) => {
@@ -139,6 +143,30 @@ client.on(Events.MessageCreate, async (message) => {
       return;
     }
 
+    // ── !countdown / !clock ─────────────────────────────────────
+    if (command === "clock" || command === "countdown" || command === "cd" || command === "demnguoc") {
+      // Kiểm tra cooldown
+      const cooldownKey = `${message.author.id}-countdown`;
+      const now = Date.now();
+      const cooldownAmount = 5000;
+
+      if (cooldowns.has(cooldownKey)) {
+      const expirationTime = cooldowns.get(cooldownKey) + cooldownAmount;
+      if (now < expirationTime) {
+        const timeLeft = (expirationTime - now) / 1000;
+        return message.reply({
+          content: `⏰ Vui lòng chờ ${timeLeft.toFixed(1)} giây trước khi dùng lệnh lại!`,
+        });
+      }
+    }
+  
+    cooldowns.set(cooldownKey, now);
+    setTimeout(() => cooldowns.delete(cooldownKey), cooldownAmount);
+  
+    await countdown.execute(message, args, client);
+    return;
+  }
+
     // ── !booster-create ──────────────────────────────────────── (ĐÃ TẠM THỜI TẮT)
     // if (command === "booster-create") {
     //   console.log(`🔵 DEBUG: !booster-create called by ${message.author.tag} at ${new Date().toISOString()}`);
@@ -224,6 +252,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
   try {
     // Gộp tất cả xử lý vào đây
     await custom.handleInteraction(interaction, client);
+
+    await countdown.handleInteraction(interaction, client);
     
     // Nếu có các handler khác, dùng if/else để tránh trùng
     // if (interaction.isButton() && interaction.customId.startsWith("approve_")) {
