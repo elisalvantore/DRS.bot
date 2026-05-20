@@ -45,10 +45,10 @@ async function handleNewMember(member, client) {
       return;
     }
 
-    // Cấp guest role để họ thấy kênh đăng ký
-    if (CONFIG.GUEST_ROLE_ID) {
-      await member.roles.add(CONFIG.GUEST_ROLE_ID).catch(() => {});
-    }
+    // // Cấp guest role để họ thấy kênh đăng ký
+    // if (CONFIG.GUEST_ROLE_ID) {
+    //   await member.roles.add(CONFIG.GUEST_ROLE_ID).catch(() => {});
+    // }
 
     // Gửi DM hỏi có muốn vào clan không
     const embed = new EmbedBuilder()
@@ -132,7 +132,8 @@ async function handleDMReaction(reaction, user, client) {
       `📝 **FORM MẪU:**\n` +
       `\`• Họ và tên:\` \n` +
       `\`• Tuổi:\` \n` +
-      `\`• Kinh nghiệm chơi game:\` \n` +
+      `\`• Tên ingame:\` \n` +
+      `\`• Thời gian chơi game:\` \n` +
       `\`• Lý do muốn gia nhập:\` \n\n` +
       `Hãy giới thiệu bản thân trong kênh đó để được cấp role thành viên!`
     );
