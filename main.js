@@ -24,6 +24,8 @@ const stealemo = require("./modules/stealemo");
 
 const custom = require("./modules/custom");
 
+const qr = require("./modules/qr");
+
 const countdown = require("./modules/countdown");
 
 const cooldowns = new Map();
@@ -154,18 +156,41 @@ client.on(Events.MessageCreate, async (message) => {
       const expirationTime = cooldowns.get(cooldownKey) + cooldownAmount;
       if (now < expirationTime) {
         const timeLeft = (expirationTime - now) / 1000;
-        return message.reply({
-          content: `⏰ Vui lòng chờ ${timeLeft.toFixed(1)} giây trước khi dùng lệnh lại!`,
-        });
+          return message.reply({
+            content: `⏰ Vui lòng chờ ${timeLeft.toFixed(1)} giây trước khi dùng lệnh lại!`,
+          });
+        }
       }
+  
+      cooldowns.set(cooldownKey, now);
+      setTimeout(() => cooldowns.delete(cooldownKey), cooldownAmount);
+  
+      await countdown.execute(message, args, client);
+      return;
     }
+
+    // ── !qr ───────────────────────────────────────────────────
+    if (command === "qr" || command === "qrcode") {
+      const cooldownKey = `${message.author.id}-qr`;
+      const now = Date.now();
+      const cooldownAmount = qr.cooldown;
+
+      if (cooldowns.has(cooldownKey)) {
+        const expirationTime = cooldowns.get(cooldownKey) + cooldownAmount;
+        if (now < expirationTime) {
+          const timeLeft = (expirationTime - now) / 1000;
+          return message.reply({
+            content: `⏰ Vui lòng chờ ${timeLeft.toFixed(1)} giây trước khi dùng lệnh lại!`,
+          });
+        }
+      }
   
-    cooldowns.set(cooldownKey, now);
-    setTimeout(() => cooldowns.delete(cooldownKey), cooldownAmount);
+      cooldowns.set(cooldownKey, now);
+      setTimeout(() => cooldowns.delete(cooldownKey), cooldownAmount);
   
-    await countdown.execute(message, args, client);
-    return;
-  }
+      await qr.execute(message, args, client);
+      return;
+    }
 
     // ── !booster-create ──────────────────────────────────────── (ĐÃ TẠM THỜI TẮT)
     // if (command === "booster-create") {
