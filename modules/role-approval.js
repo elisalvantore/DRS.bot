@@ -53,7 +53,7 @@ async function handleNewMember(member, client) {
     // Gửi DM hỏi có muốn vào clan không
     const embed = new EmbedBuilder()
       .setColor(0x00BFFF)
-      .setTitle("**👋 Welcome to ShadowTiger-Esport!**")
+      .setTitle("**👋 Welcome to ShadowTiger-Esports!**")
       .setDescription(
         `🔥 Chào mừng chiến binh **${member.user.username}**!\n\n` +
         `Bạn vừa đặt chân vào lãnh địa của chúng tôi.\n` +

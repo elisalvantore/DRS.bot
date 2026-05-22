@@ -37,10 +37,34 @@ const PREFIX = "!";
 
 client.once(Events.ClientReady, (c) => {
   console.log(`✅ Bot đã online: ${c.user.tag}`);
+
+  // Thiết lập trạng thái cho bot
+  setBotStatus(client);
+
   roleApproval.init(client);
   // custom.init(client);
   // countdown.init(client);
 });
+
+function setBotStatus(client){
+  const statuses = [
+    { name: "Tham gia giải custom cùng Clan ShadowTiger-Esports", type: "COMPETING" },
+    { name: "⭐ ShadowTiger-Esports | !help", type: "PLAYING" },
+    { name: `${client.guilds.cache.size} servers`, type: "WATCHING" }
+  ];
+
+  let index = 0;
+  setInterval(() => {
+    const status = statuses[index];
+    client.user.setPresence({
+      activities: [status],
+      status: "online"
+    });
+    index = (index + 1) % statuses.length;
+  }, 10000); // Đổi mỗi 10 giây
+
+  console.log(`✅ Đã set trạng thái bot: ${client.user.presence.activities[0]?.name || "Chưa set"}`);
+}
 
 client.on(Events.MessageCreate, async (message) => {
   // console.log(`🔵 MessageCreate event fired for: ${message.author.tag}`);
