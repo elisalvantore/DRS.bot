@@ -95,7 +95,7 @@ ${getEmoji("warning")} **LƯU Ý QUAN TRỌNG**
 **${guildConfig.CLAN_NAME || "Clan của chúng tôi"}** - Nơi ươm mầm tài năng!
       `)
       .setFooter({ 
-        text: `CUSTOM THÁNG 5/2026 • ${new Date().toLocaleDateString('vi-VN')}`, 
+        text: `CUSTOM THÁNG 6/2026 • ${new Date().toLocaleDateString('vi-VN')}`, 
         iconURL: message.guild.iconURL() 
       })
       .setTimestamp();
@@ -181,7 +181,7 @@ ${getEmoji("error")} **Bạn chưa phải là thành viên của clan ${clanName
 ${getEmoji("info")} **Để tham gia giải custom, bạn cần:**
 1️⃣ Trở thành thành viên chính thức của clan
 2️⃣ Đọc kỹ nội quy và luật lệ của clan
-3️⃣ Liên hệ với Ban Quản Trị để được hỗ trợ
+3️⃣ Liên hệ với Ban Tổ Chức để được hỗ trợ
 
 ${getEmoji("contact")} **Liên hệ ngay với Admin/Mod nhé**
 
