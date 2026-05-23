@@ -127,16 +127,16 @@ async function handleDMReaction(reaction, user, client) {
   if (emoji === "✅") {
     // User đồng ý → gửi link kênh đăng ký
     await reaction.message.channel.send(
-      `🎉 Tuyệt vời! Hãy vào kênh đăng ký bên dưới và nhắn tin để được Admin duyệt nhé:\n` +
-      `👉 ${CONFIG.REGISTER_CHANNEL_LINK}\n\n` +
+      `🎉 Tuyệt vời! Bạn hãy vào game search tên Clan: \`ST-E\` và bấm gia nhập clan!\n\n` +
+      `Sau đó hãy vào kênh đăng ký bên dưới và nhắn tin để được Admin duyệt nhé:\n` +
+      `Click vào đây nè 👉 ${CONFIG.REGISTER_CHANNEL_LINK}\n\n` +
       `📝 **FORM MẪU:**\n` +
       `\`• Họ và tên:\` \n` +
       `\`• Tuổi:\` \n` +
       `\`• Tên ingame:\` \n` +
       `\`• Thời gian chơi game:\` \n` +
       `\`• Lý do muốn gia nhập:\` \n\n` +
-      `Hãy giới thiệu bản thân trong kênh đó để được cấp role thành viên!\n\n` +
-      `Sau đó bạn hãy vào game search tên Clan: \`ST-E\` và bấm gia nhập clan nhé!`
+      `Hãy giới thiệu bản thân trong kênh đó để được cấp role thành viên!`
     );
 
     // Cấp pending role để họ thấy kênh đăng ký
