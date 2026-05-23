@@ -135,7 +135,8 @@ async function handleDMReaction(reaction, user, client) {
       `\`• Tên ingame:\` \n` +
       `\`• Thời gian chơi game:\` \n` +
       `\`• Lý do muốn gia nhập:\` \n\n` +
-      `Hãy giới thiệu bản thân trong kênh đó để được cấp role thành viên!`
+      `Hãy giới thiệu bản thân trong kênh đó để được cấp role thành viên!\n\n` +
+      `Sau đó bạn hãy vào game search tên Clan: \`ST-E\` và bấm gia nhập clan nhé!`
     );
 
     // Cấp pending role để họ thấy kênh đăng ký
