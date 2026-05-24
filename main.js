@@ -11,6 +11,7 @@ const client = new Client({
     GatewayIntentBits.GuildMessageReactions,
     GatewayIntentBits.DirectMessages,
     GatewayIntentBits.DirectMessageReactions,
+    GatewayIntentBits.GuildPresences,
   ],
 });
 
@@ -39,32 +40,100 @@ client.once(Events.ClientReady, (c) => {
   console.log(`✅ Bot đã online: ${c.user.tag}`);
 
   // Thiết lập trạng thái cho bot
-  setBotStatus(client);
+  // setBotStatus(client);
+
+  c.user.setPresence({
+    activities: [{
+      name: "Tham gia giải custom cùng Clan ShadowTiger-Esports",
+      type: "COMPETING"
+    }],
+    status: "online"
+  });
 
   roleApproval.init(client);
   // custom.init(client);
   // countdown.init(client);
 });
 
-function setBotStatus(client){
-  const statuses = [
-    { name: "Tham gia giải custom cùng Clan ShadowTiger-Esports", type: "COMPETING" },
-    { name: "⭐ ShadowTiger-Esports | !help", type: "PLAYING" },
-    { name: `${client.guilds.cache.size} servers`, type: "WATCHING" }
-  ];
+//--status1
+// function setBotStatus(client) {
+//   setTimeout(() => {
+//     // Kiểm tra bot đã ở server nào chưa
+//     console.log(`📊 Bot đang ở ${client.guilds.cache.size} servers`);
+    
+//     if (client.guilds.cache.size === 0) {
+//       console.log("⚠️ Bot chưa được invite vào server nào! Hãy invite bot vào server để thấy trạng thái.");
+//     }
+    
+//     const statuses = [
+//       { name: "Tham gia giải custom cùng Clan ShadowTiger-Esports", type: "COMPETING" },
+//       { name: "⭐ ShadowTiger-Esports | !help", type: "PLAYING" },
+//       { name: `${client.guilds.cache.size} servers`, type: "WATCHING" }
+//     ];
 
-  let index = 0;
-  setInterval(() => {
-    const status = statuses[index];
-    client.user.setPresence({
-      activities: [status],
-      status: "online"
-    });
-    index = (index + 1) % statuses.length;
-  }, 10000); // Đổi mỗi 10 giây
+//     let index = 0;
+    
+//     // Set trạng thái với try-catch để bắt lỗi
+//     try {
+//       client.user.setPresence({
+//         activities: [statuses[0]],
+//         status: "online"
+//       });
+//       console.log(`✅ Đã set trạng thái: ${statuses[0].name}`);
+//       console.log(`📌 Trạng thái hiện tại: ${client.user.presence?.activities[0]?.name || "Không có"}`);
+//     } catch (error) {
+//       console.error("❌ Lỗi khi set trạng thái:", error.message);
+//     }
+    
+//     setInterval(() => {
+//       index = (index + 1) % statuses.length;
+//       const status = statuses[index];
+//       try {
+//         client.user.setPresence({
+//           activities: [status],
+//           status: "online"
+//         });
+//         console.log(`🔄 Đã đổi trạng thái: ${status.name}`);
+//       } catch (error) {
+//         console.error("❌ Lỗi đổi trạng thái:", error.message);
+//       }
+//     }, 10000);
+    
+//   }, 2000);
+// }
 
-  console.log(`✅ Đã set trạng thái bot: ${client.user.presence.activities[0]?.name || "Chưa set"}`);
-}
+//--status2
+// function setBotStatus(client){
+//   //Đợi 1 chút để hàm hoàn tất khởi tạo
+//   setTimeout(() => {
+//     const statuses = [
+//     { name: "Tham gia giải custom cùng Clan ShadowTiger-Esports", type: "COMPETING" },
+//     { name: "⭐ ShadowTiger-Esports | !help", type: "PLAYING" },
+//     { name: `${client.guilds.cache.size} servers`, type: "WATCHING" }
+//     ];
+
+//     let index = 0;
+
+//     // Set trạng thái đầu tiên ngay lập tức
+//     client.user.setPresence({
+//       activities: [statuses[0]],
+//       status: "online"
+//     });
+
+//     // Sau đó luân phiên
+//     setInterval(() => {
+//       index = (index + 1) % statuses.length;
+//       const status = statuses[index];
+//       client.user.setPresence({
+//         activities: [status],
+//         status: "online"
+//       });
+//       console.log(`🔄 Đã đổi trạng thái: ${status.name}`);
+//     }, 10000); // Đổi mỗi 10 giây
+
+//     console.log(`✅ Đã set trạng thái bot: ${statuses[0].name}`);
+//   }, 10000);
+// }
 
 client.on(Events.MessageCreate, async (message) => {
   // console.log(`🔵 MessageCreate event fired for: ${message.author.tag}`);
