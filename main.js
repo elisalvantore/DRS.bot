@@ -29,6 +29,8 @@ const qr = require("./modules/qr");
 
 const countdown = require("./modules/countdown");
 
+const notification = require("./modules/notification");
+
 const cooldowns = new Map();
 
 const PREFIX = "!";
@@ -42,15 +44,19 @@ client.once(Events.ClientReady, (c) => {
   // Thiết lập trạng thái cho bot
   // setBotStatus(client);
 
-  c.user.setPresence({
-    activities: [{
-      name: "Tham gia giải custom cùng Clan ShadowTiger-Esports",
-      type: "COMPETING"
-    }],
-    status: "online"
-  });
+  c.user.setActivity("Tham gia giải custom cùng Clan ShadowTiger-Esports", { type: "COMPETING" });
+
+  // c.user.setPresence({
+  //   activities: [{
+  //     name: "Tham gia giải custom cùng Clan ShadowTiger-Esports",
+  //     type: "COMPETING"
+  //   }],
+  //   status: "online"
+  // });
 
   roleApproval.init(client);
+
+  notification.init(client);
   // custom.init(client);
   // countdown.init(client);
 });
@@ -139,6 +145,8 @@ client.on(Events.MessageCreate, async (message) => {
   // console.log(`🔵 MessageCreate event fired for: ${message.author.tag}`);
   
   if (message.author.bot) return;
+
+  // await notification.handleMessage(message, client);
 
   // ── Xử lý prefix commands ──────────────────────────────────
   if (message.content.startsWith(PREFIX)) {
@@ -284,6 +292,34 @@ client.on(Events.MessageCreate, async (message) => {
       await qr.execute(message, args, client);
       return;
     }
+
+    // ── !noti ────────────────────────────────────────────────
+    if (command === "noti" || command === "notification") {
+      await notification.execute(message, args, client);
+      return;
+    }
+
+    // ── !stopnoti ────────────────────────────────────────────────
+    if (command === "stopnoti" || command === "stopnotification") {
+      await notification.stop(message, args, client);
+      return;
+    }
+
+    // // ── !listnoti ────────────────────────────────────────────────
+    // if (command === "listnoti" || command === "lsnoti") {
+    //   await notification.listNotifications(message, args, client);
+    //   return;
+    // }
+
+    // // ── !delnoti ────────────────────────────────────────────────
+    // if (command === "delnoti" || command === "deletenoti") {
+    //   const notiId = args[0];
+    //   if (!notiId) {
+    //     return message.reply("❌ Vui lòng nhập ID thông báo cần xóa!\nVí dụ: `!delnoti 123456789`");
+    //   }
+    //   await notification.deleteNotification(message, notiId);
+    //   return;
+    // }
 
     // ── !booster-create ──────────────────────────────────────── (ĐÃ TẠM THỜI TẮT)
     // if (command === "booster-create") {
