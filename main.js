@@ -31,6 +31,8 @@ const countdown = require("./modules/countdown");
 
 const notification = require("./modules/notification");
 
+const dmManager = require("./modules/dm-manager");
+
 const cooldowns = new Map();
 
 const PREFIX = "!";
@@ -320,6 +322,27 @@ client.on(Events.MessageCreate, async (message) => {
     //   await notification.deleteNotification(message, notiId);
     //   return;
     // }
+
+    // ── !dm ───────────────────────────────────────────────────
+    if (command === "createdm" || command === "creatdm") {
+      await dmManager.createDM(message, args, client);
+      return;
+    }
+
+    if (command === "listdm" || command === "lsdm") {
+      await dmManager.listDM(message, args, client);
+      return;
+    }
+
+    if (command === "dm" || command === "senddm") {
+      await dmManager.sendDM(message, args, client);
+      return;
+    }
+
+    if (command === "deletedm" || command === "del dm") {
+      await dmManager.deleteDM(message, args, client);
+      return;
+    }
 
     // ── !booster-create ──────────────────────────────────────── (ĐÃ TẠM THỜI TẮT)
     // if (command === "booster-create") {
